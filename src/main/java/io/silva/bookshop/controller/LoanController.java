@@ -1,11 +1,7 @@
 package io.silva.bookshop.controller;
 
 import io.silva.bookshop.model.Loan;
-import io.silva.bookshop.repository.BookRepository;
-import io.silva.bookshop.repository.UserRepository;
-import io.silva.bookshop.service.BookService;
 import io.silva.bookshop.service.LoanService;
-import io.silva.bookshop.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +35,7 @@ public class LoanController {
     }
 
     @GetMapping("loan_book/{id}")
-    public List<Loan> listBookLoans(@PathVariable UUID id){
+    public Loan listBookLoans(@PathVariable UUID id){
         return loanService.listBookLoans(id);
     }
 

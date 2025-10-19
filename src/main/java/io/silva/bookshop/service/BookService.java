@@ -1,5 +1,6 @@
 package io.silva.bookshop.service;
 
+import io.silva.bookshop.NotFoundException;
 import io.silva.bookshop.model.Book;
 import io.silva.bookshop.repository.BookRepository;
 import lombok.AllArgsConstructor;
@@ -16,31 +17,57 @@ public class BookService {
     BookRepository bookRepository;
 
     public void saveBook(Book b){
-        b.setLoan(false);
-        bookRepository.save(b);
+        Book byTitle = bookRepository.findByTitle(b.getTitle());
+        if (byTitle == null){
+            b.setLoan(false);
+            bookRepository.save(b);
+        }else {
+            throw new RuntimeException("Book already registered!");
+        }
     }
 
     public List<Book> listAll(){
-        return bookRepository.findAllBooksSorted();
+        List<Book> allBooksSorted = bookRepository.findAllBooksSorted();
+        if (allBooksSorted.isEmpty()){
+            throw new RuntimeException("no books registered!");
+        }else {
+            return allBooksSorted;
+        }
     }
 
+    public Book searchBook(UUID uuid){
+        return bookRepository.findById(uuid).orElseThrow(() -> new NotFoundException("Book not found!"));
+    }
+
+
     public List<Book> listBookByTitle(String title){
-        return bookRepository.findByTitleContainingIgnoreCase(title);
+        List<Book> byTitleContainingIgnoreCase = bookRepository.findByTitleContainingIgnoreCase(title);
+        if (byTitleContainingIgnoreCase.isEmpty()){
+            throw new RuntimeException("No books found!");
+        }else {
+            return byTitleContainingIgnoreCase;
+        }
     }
 
     public List<Book> listByAuthor(String author){
-        return bookRepository.findByAuthorContainingIgnoreCase(author);
+        List<Book> byAuthorContainingIgnoreCase = bookRepository.findByAuthorContainingIgnoreCase(author);
+        if (byAuthorContainingIgnoreCase.isEmpty()){
+            throw new RuntimeException("No books found!");
+        } else {
+            return byAuthorContainingIgnoreCase;
+        }
     }
 
-    public void updateBook(String uuid, Book b){
-        Book byId = bookRepository.findById(UUID.fromString(uuid)).orElse(null);
+    public void updateBook(UUID uuid, Book b){
+        Book byId = searchBook(uuid);
         byId.setTitle(b.getTitle());
         byId.setAuthor(b.getAuthor());
         byId.setPublicationDate(b.getPublicationDate());
         bookRepository.save(byId);
     }
 
-    public void deleteBook(String uuid){
-        bookRepository.deleteById(UUID.fromString(uuid));
+    public void deleteBook(UUID uuid){
+        searchBook(uuid);
+        bookRepository.deleteById(uuid);
     }
 }

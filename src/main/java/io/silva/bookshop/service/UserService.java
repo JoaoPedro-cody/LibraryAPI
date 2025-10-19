@@ -1,5 +1,6 @@
 package io.silva.bookshop.service;
 
+import io.silva.bookshop.NotFoundException;
 import io.silva.bookshop.model.User;
 import io.silva.bookshop.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -14,28 +15,40 @@ import java.util.List;
 public class UserService {
     UserRepository userRepository;
 
-    public void saveUser(User user){
-        userRepository.save(user);
+    public void saveUser(User user) {
+        User byEmail = userRepository.findByEmail(user.getEmail());
+        if (byEmail == null){
+            userRepository.save(user);
+        }else {
+            throw new RuntimeException("This email has already been registered!");
+        }
     }
 
     public List<User> searchUsers(){
-        return userRepository.findAll();
+        List<User> all = userRepository.findAll();
+        if (all.isEmpty()){
+            throw new RuntimeException("No registered users!");
+        } else {
+            return all;
+        }
     }
 
     public User searchUserEmail(String email){
-        return userRepository.findByEmail(email);
+        User byEmail = userRepository.findByEmail(email);
+        if (byEmail == null){
+            throw new NotFoundException("User not found!");
+        }else {
+            return byEmail;
+        }
     }
 
-    public User updateUser(User user, String email){
-        User byEmail = userRepository.findByEmail(email);
+    public void updateUser(User user, String email){
+        User byEmail = searchUserEmail(email);
         byEmail.setEmail(user.getEmail());
         byEmail.setName(user.getName());
-        userRepository.save(byEmail);
-
-        return byEmail;
     }
 
     public void deleteUser(String email){
-        userRepository.deleteUserByEmail(email);
+        userRepository.delete(searchUserEmail(email));
     }
 }

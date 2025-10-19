@@ -25,19 +25,23 @@ public class LoanService {
     public void saveLoan(UUID bookId, UUID userId){
         Loan loan = new Loan();
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book Not Found"));
-        book.setLoan(true);
+        if (book.getLoan() == true){
+            throw new RuntimeException("This book has already been borrowed!");
+        }else {
+            book.setLoan(true);
 
-        LocalDate localDate = LocalDate.now();
-        loan.setLoanDate(localDate);
-        loan.setReturnDate(localDate.plusDays(7));
-        loan.setBook(book);
-        loan.setUser(userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not Found")));
+            LocalDate localDate = LocalDate.now();
+            loan.setLoanDate(localDate);
+            loan.setReturnDate(localDate.plusDays(7));
+            loan.setBook(book);
+            loan.setUser(userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not Found")));
 
-
-        loanRepository.save(loan);
+            loanRepository.save(loan);
+        }
     }
 
     public void deleteLoan(UUID loanId){
+        searchLoan(loanId);
         loanRepository.deleteById(loanId);
     }
 
@@ -46,14 +50,24 @@ public class LoanService {
     }
 
     public List<Loan> listLoans(){
-        return loanRepository.findAll();
+        List<Loan> all = loanRepository.findAll();
+        if (all.isEmpty()){
+            throw new RuntimeException("No loans registered");
+        } else {
+            return all;
+        }
     }
 
-    public List<Loan> listBookLoans(UUID bookId){
+    public Loan listBookLoans(UUID bookId){
         return loanRepository.findByBook(bookRepository.findById(bookId).orElseThrow(() -> new NotFoundException("Book not found")));
     }
 
     public List<Loan> listUserLoans(UUID userId){
-        return loanRepository.findByUser(userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found")));
+        List<Loan> userLoans = loanRepository.findByUser(userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found")));
+        if (userLoans.isEmpty()){
+            throw new RuntimeException("This user did not borrow any books!");
+        } else {
+            return userLoans;
+        }
     }
 }
