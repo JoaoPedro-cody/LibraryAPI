@@ -9,6 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface LoanRepository extends JpaRepository<Loan, UUID> {
-    List<Loan> findByBook(Book b);
+    Loan findByBook(Book b);
     List<Loan> findByUser(User user);
 }
