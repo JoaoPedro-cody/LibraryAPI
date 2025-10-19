@@ -41,7 +41,8 @@ public class LoanService {
     }
 
     public void deleteLoan(UUID loanId){
-        searchLoan(loanId);
+        Loan loan = searchLoan(loanId);
+        loan.getBook().setLoan(false);
         loanRepository.deleteById(loanId);
     }
 
