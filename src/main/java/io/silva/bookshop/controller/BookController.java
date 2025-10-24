@@ -14,32 +14,27 @@ import java.util.UUID;
 public class BookController {
     private BookService bookService;
 
-    @PostMapping("/save")
+    @PostMapping
     public void saveBook(@RequestBody Book book){
         bookService.saveBook(book);
     }
 
-    @GetMapping("/all-books")
-    public List<Book> searchBook(){
-        return bookService.listAll();
+    @GetMapping("{id}")
+    public Book searchBook(@PathVariable UUID id){
+        return bookService.searchBook(id);
     }
 
-    @GetMapping("/by-title/{title}")
-    public List<Book> searchBookByTitle(@PathVariable String title){
-        return bookService.listBookByTitle(title);
+    @GetMapping
+    public List<Book> searchBooks(@RequestParam(required = false) String title, @RequestParam(required = false) String author){
+        return bookService.listAll(title, author);
     }
 
-    @GetMapping("/by-author/{author}")
-    public List<Book> searchByAuthor(@PathVariable String author){
-        return bookService.listByAuthor(author);
-    }
-
-    @PutMapping("/update/{id}")
+    @PutMapping("{id}")
     public void updateBook(@PathVariable UUID id, @RequestBody Book b){
         bookService.updateBook(id, b);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("{id}")
     public void  deleteBook(@PathVariable UUID id){
         bookService.deleteBook(id);
     }

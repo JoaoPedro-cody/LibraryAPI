@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,12 +25,18 @@ public class UserService {
         }
     }
 
-    public List<User> searchUsers(){
+    public List<User> searchUsers(String name, String email){
         List<User> all = userRepository.findAll();
-        if (all.isEmpty()){
-            throw new RuntimeException("No registered users!");
-        } else {
-            return all;
+        if (name != null){
+            return userRepository.findByNameContainingIgnoreCase(name);
+        } else if (email != null){
+            return List.of(searchUserEmail(email));
+        } else{
+            if (all.isEmpty()){
+                throw new RuntimeException("No registered users!");
+            } else {
+                return all;
+            }
         }
     }
 

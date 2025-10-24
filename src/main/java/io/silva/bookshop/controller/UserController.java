@@ -19,13 +19,8 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> searchAllUsers(){
-        return userService.searchUsers();
-    }
-
-    @GetMapping("{email}")
-    public User searchUserByEmail(@PathVariable String email){
-        return userService.searchUserEmail(email);
+    public List<User> searchAllUsers(@RequestParam(required = false) String name, @RequestParam(required = false) String email){
+        return userService.searchUsers(name, email);
     }
 
     @PutMapping("{email}")
