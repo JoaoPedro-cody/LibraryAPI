@@ -1,5 +1,6 @@
 package io.silva.bookshop.controller;
 
+import io.silva.bookshop.dto.CreateLoanRequest;
 import io.silva.bookshop.model.Loan;
 import io.silva.bookshop.service.LoanService;
 import lombok.AllArgsConstructor;
@@ -14,33 +15,29 @@ import java.util.UUID;
 public class LoanController {
     LoanService loanService;
 
-    @PostMapping("save/{bookId}/{userId}")
-    public void createLoan(@PathVariable UUID bookId, @PathVariable UUID userId){
-        loanService.saveLoan(bookId, userId);
+    @PostMapping
+    public void createLoan(@RequestBody CreateLoanRequest createLoanRequest) {
+        loanService.saveLoan(createLoanRequest);
     }
 
-    @DeleteMapping("delete/{id}")
-    public void deleteLoan(@PathVariable UUID id){
-        loanService.deleteLoan(id);
-    }
-
-    @GetMapping("search_loan/{id}")
-    public Loan searchLoan(@PathVariable UUID id){
+    @GetMapping("{id}")
+    public Loan searchLoan(@PathVariable UUID id) {
         return loanService.searchLoan(id);
     }
 
-    @GetMapping("all_loan")
-    public List<Loan> listAllLoans(){
-        return loanService.listLoans();
+    @GetMapping
+    public List<Loan> searchLoans(@RequestParam(required = false) UUID bookId, @RequestParam(required = false) UUID userId) {
+        return loanService.listLoans(bookId, userId);
     }
 
-    @GetMapping("loan_book/{id}")
-    public Loan listBookLoans(@PathVariable UUID id){
-        return loanService.listBookLoans(id);
+    @PutMapping("{id}")
+    public void updateLoan(@PathVariable UUID id, @RequestBody CreateLoanRequest createLoanRequest){
+        loanService.updateLoan(createLoanRequest, id);
     }
 
-    @GetMapping("loan_user/{id}")
-    public List<Loan> listUserLoans(@PathVariable UUID id){
-        return loanService.listUserLoans(id);
+    @DeleteMapping("{id}")
+    public void deleteLoan(@PathVariable UUID id) {
+        loanService.deleteLoan(id);
     }
+
 }
